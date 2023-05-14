@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "Reddit User Tag",
+  "version": "1.0",
+  "description": "Tag specific Reddit users",
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.reddit.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": ["storage"]
+}
