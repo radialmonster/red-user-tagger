@@ -6,3 +6,14 @@ chrome.runtime.onInstalled.addListener(function() {
     }
   });
 });
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === 'getUsernames') {
+    chrome.storage.local.get('usernames', function(data) {
+      sendResponse({data: data.usernames});
+    });
+
+    // This ensures the response is sent even if the listener returns before `chrome.storage.local.get` completes
+    return true; 
+  }
+});

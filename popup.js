@@ -4,10 +4,16 @@ function displayUsernames() {
     const list = document.getElementById('list');
     list.innerHTML = '';
 
-    for (let user in data.usernames) {
-      const item = document.createElement('p');
-      item.textContent = `${user}: ${data.usernames[user]}`;
-      list.appendChild(item);
+    if (data && data.usernames) {
+      const fragment = document.createDocumentFragment();
+
+      for (let user in data.usernames) {
+        const item = document.createElement('p');
+        item.textContent = `${user}: ${data.usernames[user]}`;
+        fragment.appendChild(item);
+      }
+
+      list.appendChild(fragment);
     }
   });
 }
@@ -18,7 +24,6 @@ document.getElementById('add').addEventListener('click', function() {
   const lines = userlist.split('\n');
 
   chrome.storage.local.get('usernames', function(data) {
-    // Create a new object and assign data.usernames to it if it exists, or assign an empty object if it doesn't
     let usernames = data.usernames || {};
 
     lines.forEach(function(line) {
@@ -83,27 +88,36 @@ function importCSV(replace) {
   }
 
   const reader = new FileReader();
+
   reader.onload = function(e) {
     const contents = e.target.result;
     const lines = contents.split('\n');
 
     chrome.storage.local.get('usernames', function(data) {
       let usernames = replace ? {} : data.usernames || {};
+      let importCount = 0;
 
       lines.forEach(function(line) {
         const [username, tag] = line.split(',');
 
         if (username && tag) {
           usernames[username.trim()] = tag.trim();
+          importCount++;
         }
       });
 
       chrome.storage.local.set({usernames: usernames}, function() {
         displayUsernames();
-        alert('Imported successfully.');
+        alert(importCount > 0 ? 'Imported successfully.' : 'No valid data to import.');
       });
     });
   };
+
+  reader.onerror = function() {
+    alert('Failed to read file');
+    reader.abort();
+  };
+
   reader.readAsText(file);
 }
 
