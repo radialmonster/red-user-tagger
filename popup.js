@@ -18,7 +18,6 @@ document.getElementById('add').addEventListener('click', function() {
   const lines = userlist.split('\n');
 
   chrome.storage.local.get('usernames', function(data) {
-    // Create a new object and assign data.usernames to it if it exists, or assign an empty object if it doesn't
     let usernames = data.usernames || {};
 
     lines.forEach(function(line) {
@@ -40,6 +39,29 @@ document.getElementById('add').addEventListener('click', function() {
 document.getElementById('clear').addEventListener('click', function() {
   chrome.storage.local.set({usernames: {}}, function() {
     displayUsernames();
+  });
+});
+
+// Export all usernames and their tags when the Export button is clicked.
+document.getElementById('export').addEventListener('click', function() {
+  chrome.storage.local.get('usernames', function(data) {
+    let usernames = data.usernames || {};
+    let csvContent = '';
+
+    for (let user in usernames) {
+      csvContent += `${user},${usernames[user]}\n`;
+    }
+
+    let blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+    let url  = URL.createObjectURL(blob);
+
+    // Create a link and click it to start the download
+    let downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = 'usernames.csv';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   });
 });
 
