@@ -2,7 +2,7 @@ let taggedUsers = [];
 let alertedUsers = [];
 
 function addTags() {
-  chrome.storage.local.get('usernames', function(data) {
+  chrome.storage.local.get('usernames', (data) => {
     let authors = document.querySelectorAll('p > a');
 
     authors.forEach(function(author) {
