@@ -12,7 +12,13 @@
     <textarea id="userlist" name="userlist" rows="10" cols="30"></textarea><br>
     <button id="add">Add</button>
     <button id="clear">Clear All</button>
-    <button id="export">Export</button>
+    <hr>
+    <label for="file-input">Import CSV:</label><br>
+    <input id="file-input" type="file" accept=".csv"><br>
+    <button id="import-replace">Import and Replace</button>
+    <button id="import-add">Import and Add</button>
+    <hr>
+    <button id="export">Export to CSV</button>
     <div id="list"></div>
     <script src="popup.js"></script>
   </body>

@@ -18,6 +18,7 @@ document.getElementById('add').addEventListener('click', function() {
   const lines = userlist.split('\n');
 
   chrome.storage.local.get('usernames', function(data) {
+    // Create a new object and assign data.usernames to it if it exists, or assign an empty object if it doesn't
     let usernames = data.usernames || {};
 
     lines.forEach(function(line) {
@@ -42,28 +43,69 @@ document.getElementById('clear').addEventListener('click', function() {
   });
 });
 
-// Export all usernames and their tags when the Export button is clicked.
+// Export usernames and their tags to a CSV file when the Export button is clicked.
 document.getElementById('export').addEventListener('click', function() {
   chrome.storage.local.get('usernames', function(data) {
-    let usernames = data.usernames || {};
-    let csvContent = '';
+    let csvContent = 'username,tag\n';
 
-    for (let user in usernames) {
-      csvContent += `${user},${usernames[user]}\n`;
+    for (let user in data.usernames) {
+      csvContent += `${user},${data.usernames[user]}\n`;
     }
 
     let blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
-    let url  = URL.createObjectURL(blob);
+    let url = URL.createObjectURL(blob);
 
-    // Create a link and click it to start the download
-    let downloadLink = document.createElement('a');
-    downloadLink.href = url;
-    downloadLink.download = 'usernames.csv';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    let link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'usernames.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   });
 });
+
+// Import usernames and their tags from a CSV file when the Import buttons are clicked.
+document.getElementById('import-replace').addEventListener('click', function() {
+  importCSV(true);
+});
+
+document.getElementById('import-add').addEventListener('click', function() {
+  importCSV(false);
+});
+
+function importCSV(replace) {
+  const fileInput = document.getElementById('file-input');
+  const file = fileInput.files[0];
+  if (!file) {
+    alert('Please select a CSV file first.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const contents = e.target.result;
+    const lines = contents.split('\n');
+
+    chrome.storage.local.get('usernames', function(data) {
+      let usernames = replace ? {} : data.usernames || {};
+
+      lines.forEach(function(line) {
+        const [username, tag] = line.split(',');
+
+        if (username && tag) {
+          usernames[username.trim()] = tag.trim();
+        }
+      });
+
+      chrome.storage.local.set({usernames: usernames}, function() {
+        displayUsernames();
+        alert('Imported successfully.');
+      });
+    });
+  };
+  reader.readAsText(file);
+}
 
 // Display the list of usernames and their tags when the popup is opened.
 displayUsernames();
