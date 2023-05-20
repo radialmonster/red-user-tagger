@@ -50,15 +50,14 @@ function createTagButton() {
 
 
 function copyToClipboard() {
-    let tempInput = document.createElement('textarea');
-    tempInput.style = 'position: absolute; left: -1000px; top: -1000px';
-    tempInput.value = taggedUsers.map(user => `/u/${user}`).join('\n');
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand('copy');
-    document.body.removeChild(tempInput);
-    alert('Tagged users copied to clipboard!');
+  let textToCopy = taggedUsers.map(username => `/u/${username}`).join('\n\n');
+  navigator.clipboard.writeText(textToCopy).then(function() {
+    console.log('Tagged usernames copied to clipboard');
+  }, function(err) {
+    console.error('Could not copy tagged usernames: ', err);
+  });
 }
+
 
 let observer = new MutationObserver(function(mutations) {
   mutations.forEach(function(mutation) {
