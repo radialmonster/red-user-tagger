@@ -26,3 +26,5 @@ Reddit User Tag is a Google Chrome extension designed to highlight specific user
 1. If a tagged user appears in the comments section of a Reddit page, a tag with a red background is appended next to their username.
 2. If there are tagged users on a page, an alert will appear, listing all the tagged users on that page.
 3. A button labeled "Copy tagged users" will appear on the bottom right corner of the page when tagged users are detected. Clicking this button will copy the list of tagged users to the clipboard in the format `/u/username` with a blank line between each username.
+
+This has been tested with https://old.reddit.com and not the new reddit.com
